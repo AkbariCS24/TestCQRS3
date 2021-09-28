@@ -22,5 +22,12 @@ namespace TestCQRS3.Application.Query
                 return _database.GetCollection<ItemQueryModel>("Item");
             }
         }
+        internal IMongoCollection<Item2QueryModel> Item2
+        {
+            get
+            {
+                return _database.GetCollection<Item2QueryModel>("Item2");
+            }
+        }
     }
 }

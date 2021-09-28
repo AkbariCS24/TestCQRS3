@@ -10,10 +10,10 @@ namespace TestCQRS3.Application.Command.Commands.Items
 {
     public class CreateItemCommandHandler : IRequestHandler<CreateItemCommand, CreateItemCommand>
     {
-        private readonly IItemService _service;
+        private readonly IServiceWrapper _service;
         private readonly IMediator _mediator;
 
-        public CreateItemCommandHandler(IItemService service, IMediator mediator)
+        public CreateItemCommandHandler(IServiceWrapper service, IMediator mediator)
         {
             _service = service;
             _mediator = mediator;
@@ -29,7 +29,7 @@ namespace TestCQRS3.Application.Command.Commands.Items
                     Field2 = request.Field2,
                     Field3 = request.Field3
                 };
-                _service.Add(item);
+                _service.Item.Add(item);
                 request.Id = item.Id;
 
                 ItemAddedEvent Event = new(item);

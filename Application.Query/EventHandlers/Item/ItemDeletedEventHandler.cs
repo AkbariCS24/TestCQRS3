@@ -18,7 +18,7 @@ namespace TestCQRS3.Application.Query.EventHandlers.Item
         public Task Handle(ItemDeletedEvent notification, CancellationToken cancellationToken)
         {
             _context.Item.DeleteOne(p => p.SqlId == notification.Id);
-
+            _context.Item2.DeleteMany(p => p.ItemId == notification.Id);
             return Task.CompletedTask;
         }
     }

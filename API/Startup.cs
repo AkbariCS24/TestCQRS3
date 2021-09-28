@@ -19,6 +19,12 @@ using TestCQRS3.Domain.Contracts;
 using TestCQRS3.Infrastructure.Persistence;
 using TestCQRS3.Infrastructure.Services;
 using TestCQRS3.Application.Command.Commands.Items;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using TestCQRS3.Application.Command.Common;
+using Microsoft.AspNetCore.Authorization;
+using TestCQRS3.API.CustomHandler;
 
 namespace TestCQRS3.API
 {
@@ -43,21 +49,74 @@ namespace TestCQRS3.API
             services.AddSingleton<ReadDBContext>();
 
             //Add DBContext
+            services.AddScoped<ITestCQRS3DBContext, TestCQRS3DBContext>();
             services.AddDbContext<TestCQRS3DBContext>(options =>
              options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             //Add Service
-            services.AddScoped<IItemService, ItemService>();
+            services.AddScoped<IServiceWrapper, ServiceWrapper>();
 
             //Add MediatR
             services.AddMediatR(typeof(ReadDBContext).Assembly);
             services.AddMediatR(typeof(CreateItemCommand).Assembly);
 
-            services.AddControllers();
-            services.AddSwaggerGen(c =>
+            //Add JWT
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                    .AddJwtBearer(options =>
+                    {
+                        options.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ValidateIssuer = true,
+                            ValidateAudience = true,
+                            ValidateLifetime = true,
+                            ValidateIssuerSigningKey = true,
+                            ValidIssuer = Configuration["Jwt:Issuer"],
+                            ValidAudience = Configuration["Jwt:Issuer"],
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+                        };
+                    });
+
+
+            //services.AddSwaggerGen();
+            services.AddSwaggerGen(swagger =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
+                //This is to generate the Default UI of Swagger Documentation
+                swagger.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "TestCQRS3",
+                    Description = "Impliment CQRS With Clean Architecture"
+                });
+                // To Enable authorization using Swagger (JWT)
+                swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "Enter ‘Bearer’ [space] and then your valid token in the text input below.\r\n\r\nExample: \"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\"",
+                });
+                swagger.AddSecurityRequirement(new OpenApiSecurityRequirement
+                 {
+                 {
+                 new OpenApiSecurityScheme
+                 {
+                 Reference = new OpenApiReference
+                 {
+                 Type = ReferenceType.SecurityScheme,
+                 Id = "Bearer"
+                 }
+                 },
+                 new string[] {}
+                 }
+                 });
             });
+
+            services.AddControllersWithViews();
+
+            services.AddScoped<IAuthorizationHandler, RolesAuthorizationHandler>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -66,13 +125,20 @@ namespace TestCQRS3.API
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
             }
+
+            app.UseSwagger();
+
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+            });
 
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

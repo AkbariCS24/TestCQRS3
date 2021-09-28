@@ -2,15 +2,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TestCQRS3.Infrastructure.Persistence;
 
 namespace TestCQRS3.Infrastructure.Migrations
 {
     [DbContext(typeof(TestCQRS3DBContext))]
-    partial class TestCQRS3DBContextModelSnapshot : ModelSnapshot
+    [Migration("20210928082444_add-user-role")]
+    partial class adduserrole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

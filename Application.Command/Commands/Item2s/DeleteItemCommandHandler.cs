@@ -3,28 +3,28 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using TestCQRS3.Domain.Contracts;
-using TestCQRS3.Domain.Events.Item;
+using TestCQRS3.Domain.Events.Item2s;
 
-namespace TestCQRS3.Application.Command.Commands.Items
+namespace TestCQRS3.Application.Command.Commands.Item2s
 {
-    public class DeleteItemCommandHandler : IRequestHandler<DeleteItemCommand, bool>
+    public class DeleteItem2CommandHandler : IRequestHandler<DeleteItem2Command, bool>
     {
         private readonly IServiceWrapper _service;
         private readonly IMediator _mediator;
 
-        public DeleteItemCommandHandler(IServiceWrapper service, IMediator mediator)
+        public DeleteItem2CommandHandler(IServiceWrapper service, IMediator mediator)
         {
             _service = service;
             _mediator = mediator;
         }
 
-        public Task<bool> Handle(DeleteItemCommand request, CancellationToken cancellationToken)
+        public Task<bool> Handle(DeleteItem2Command request, CancellationToken cancellationToken)
         {
             try
             {
-                _service.Item.Delete(request.Id);
+                _service.Item2.Delete(request.Id);
 
-                ItemDeletedEvent Event = new(request.Id);
+                Item2DeletedEvent Event = new(request.Id);
                 _mediator.Publish(Event);
 
                 return Task.FromResult(true);

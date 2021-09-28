@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -13,6 +14,7 @@ namespace TestCQRS3.API.Controllers
 {
     [Route("api/items")]
     [ApiController]
+    [Authorize]
     public class ItemsController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -35,12 +37,14 @@ namespace TestCQRS3.API.Controllers
         }
         
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<CreateItemCommand>> Create([FromBody] CreateItemCommand createItemCommand)
         {
             return await _mediator.Send(createItemCommand);
         }
         
         [HttpPut]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> Update([FromBody] UpdateItemCommand updateItemCommand)
         {
             await _mediator.Send(updateItemCommand);
@@ -48,6 +52,7 @@ namespace TestCQRS3.API.Controllers
         }
         
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> Delete(int id)
         {
             await _mediator.Send(new DeleteItemCommand(id));

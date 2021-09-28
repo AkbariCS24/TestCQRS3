@@ -9,8 +9,8 @@ using TestCQRS3.Infrastructure.Persistence;
 namespace TestCQRS3.Infrastructure.Migrations
 {
     [DbContext(typeof(TestCQRS3DBContext))]
-    [Migration("20210925063831_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20210926075128_initial-create")]
+    partial class initialcreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -39,6 +39,48 @@ namespace TestCQRS3.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Items");
+                });
+
+            modelBuilder.Entity("TestCQRS3.Domain.Entities.Item2", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Field1")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Field2")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Field3")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ItemId");
+
+                    b.ToTable("Item2s");
+                });
+
+            modelBuilder.Entity("TestCQRS3.Domain.Entities.Item2", b =>
+                {
+                    b.HasOne("TestCQRS3.Domain.Entities.Item", "Item")
+                        .WithMany("Item2s")
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Item");
+                });
+
+            modelBuilder.Entity("TestCQRS3.Domain.Entities.Item", b =>
+                {
+                    b.Navigation("Item2s");
                 });
 #pragma warning restore 612, 618
         }
