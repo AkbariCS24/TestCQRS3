@@ -1,6 +1,4 @@
-﻿using MediatR;
-
-namespace TestCQRS3.Application.Command.Commands.Account
+﻿namespace TestCQRS3.Application.Command.Commands.Account
 {
     public record UserCommandResult
     {
@@ -8,5 +6,6 @@ namespace TestCQRS3.Application.Command.Commands.Account
         public string UserName { get; set; }
         public string Password { get; set; }
         public string Email { get; set; }
+        public string Role { get; set; }
     }
 }

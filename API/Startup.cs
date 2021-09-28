@@ -24,7 +24,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TestCQRS3.Application.Command.Common;
 using Microsoft.AspNetCore.Authorization;
-using TestCQRS3.API.CustomHandler;
 
 namespace TestCQRS3.API
 {
@@ -114,8 +113,6 @@ namespace TestCQRS3.API
             });
 
             services.AddControllersWithViews();
-
-            services.AddScoped<IAuthorizationHandler, RolesAuthorizationHandler>();
 
         }
 

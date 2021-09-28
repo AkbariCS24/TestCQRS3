@@ -69,7 +69,8 @@ namespace TestCQRS3.API.Controllers
             var claims = new[] {
             new Claim(JwtRegisteredClaimNames.Sub, userInfo.UserName),
             new Claim(JwtRegisteredClaimNames.Email, userInfo.Email),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(ClaimTypes.Role,userInfo.Role)
             };
 
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],

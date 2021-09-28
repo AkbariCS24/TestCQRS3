@@ -1,12 +1,8 @@
 ﻿using MediatR;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using TestCQRS3.Application.Command.Common;
-using Microsoft.EntityFrameworkCore;
 using TestCQRS3.Domain.Entities;
 
 namespace TestCQRS3.Application.Command.Commands.Account
