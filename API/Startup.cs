@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using System;
@@ -24,6 +23,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TestCQRS3.Application.Command.Common;
 using Microsoft.AspNetCore.Authorization;
+using TestCQRS3.Infrastructure.Logging;
 
 namespace TestCQRS3.API
 {
@@ -46,6 +46,7 @@ namespace TestCQRS3.API
                 sp.GetRequiredService<IOptions<TestCQRS3DatabaseSettings>>().Value);
 
             services.AddSingleton<ReadDBContext>();
+            services.AddSingleton<LogDBContext>();
 
             //Add DBContext
             services.AddScoped<ITestCQRS3DBContext, TestCQRS3DBContext>();
@@ -113,6 +114,9 @@ namespace TestCQRS3.API
             });
 
             services.AddControllersWithViews();
+
+            //Add Logger
+            services.AddScoped<ILogger, Logger>();
 
         }
 

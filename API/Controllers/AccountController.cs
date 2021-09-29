@@ -11,7 +11,8 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using TestCQRS3.Application.Command.Commands.Account;
-using TestCQRS3.Application.Query.QueryModel;
+using TestCQRS3.Domain.Contracts;
+using TestCQRS3.Domain.Enums;
 
 namespace TestCQRS3.API.Controllers
 {
@@ -20,11 +21,13 @@ namespace TestCQRS3.API.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly ILogger _logger;
         private IConfiguration _config;
 
-        public AccountController(IMediator mediator, IConfiguration config)
+        public AccountController(IMediator mediator, IConfiguration config, ILogger logger)
         {
             _mediator = mediator;
+            _logger = logger;
             _config = config;
         }
 
@@ -40,6 +43,7 @@ namespace TestCQRS3.API.Controllers
             {
                 var tokenString = GenerateJSONWebToken(user);
                 response = Ok(new { token = tokenString });
+                _logger.Log(LogType.UserLogin, user.UserName, $"loggin date: {DateTime.Now}");
             }
 
             return response;
@@ -56,8 +60,9 @@ namespace TestCQRS3.API.Controllers
             if (user != null)
             {
                 response = Ok(new { user = userRegister });
+                _logger.Log(LogType.UserRegister, user.UserName, $"register date: {DateTime.Now}");
             }
-        
+
             return response;
         }
 
@@ -70,13 +75,14 @@ namespace TestCQRS3.API.Controllers
             new Claim(JwtRegisteredClaimNames.Sub, userInfo.UserName),
             new Claim(JwtRegisteredClaimNames.Email, userInfo.Email),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.Role,userInfo.Role)
+            new Claim(ClaimTypes.Role,userInfo.Role),
+            new Claim(ClaimTypes.Name,userInfo.UserName)
             };
 
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],
                 _config["Jwt:Issuer"],
                 claims,
-                expires: DateTime.Now.AddMinutes(120),
+                expires: DateTime.Now.AddMinutes(60),
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
