@@ -4,12 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using TestCQRS3.Application.Command.Commands.Account;
 using TestCQRS3.Domain.Contracts;
 using TestCQRS3.Domain.Enums;
@@ -76,7 +73,6 @@ namespace TestCQRS3.API.Controllers
             new Claim(JwtRegisteredClaimNames.Email, userInfo.Email),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(ClaimTypes.Role,userInfo.Role),
-            new Claim(ClaimTypes.Name,userInfo.UserName)
             };
 
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],

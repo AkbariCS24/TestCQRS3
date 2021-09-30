@@ -1,29 +1,23 @@
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
+using TestCQRS3.Application.Command.Commands.Items;
+using TestCQRS3.Application.Command.Common;
 using TestCQRS3.Application.Query;
 using TestCQRS3.Domain;
 using TestCQRS3.Domain.Contracts;
+using TestCQRS3.Infrastructure.Logging;
 using TestCQRS3.Infrastructure.Persistence;
 using TestCQRS3.Infrastructure.Services;
-using TestCQRS3.Application.Command.Commands.Items;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using TestCQRS3.Application.Command.Common;
-using Microsoft.AspNetCore.Authorization;
-using TestCQRS3.Infrastructure.Logging;
 
 namespace TestCQRS3.API
 {
