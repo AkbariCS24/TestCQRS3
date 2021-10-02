@@ -39,7 +39,10 @@ namespace TestCQRS3.API
             services.AddSingleton<ITestCQRS3DatabaseSettings>(sp =>
                 sp.GetRequiredService<IOptions<TestCQRS3DatabaseSettings>>().Value);
 
+            // Add ReadDbContext
             services.AddSingleton<ReadDBContext>();
+
+            // Add LogDbContext
             services.AddSingleton<LogDBContext>();
 
             //Add DBContext
