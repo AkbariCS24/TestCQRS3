@@ -5,6 +5,7 @@
     {
         public string ConnectionString { get; set; }
         public string DatabaseName { get; set; }
+        public string LogConnectionString { get; set; }
         public string LogDBName { get; set; }
     }
 
@@ -12,6 +13,7 @@
     {
         string ConnectionString { get; set; }
         string DatabaseName { get; set; }
+        string LogConnectionString { get; set; }
         string LogDBName { get; set; }
     }
 }

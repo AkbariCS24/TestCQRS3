@@ -23,13 +23,12 @@ namespace TestCQRS3.Application.Command.Commands.Items
         {
             try
             {
-                Item item = new()
-                {
-                    Id = request.Id,
-                    Field1 = request.Field1,
-                    Field2 = request.Field2,
-                    Field3 = request.Field3
-                };
+                var item = Item.CreateItem(
+                     request.Id,
+                     request.Field1,
+                     request.Field2,
+                     request.Field3);
+
                 _service.Item.Update(item);
 
                 ItemUpdatedEvent Event = new(item);
