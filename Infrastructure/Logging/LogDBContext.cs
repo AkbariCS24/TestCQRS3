@@ -11,7 +11,7 @@ namespace TestCQRS3.Infrastructure.Logging
 
         public LogDBContext(ITestCQRS3DatabaseSettings TestCQRS3DatabaseSettings)
         {
-            _mongoClient = new MongoClient(TestCQRS3DatabaseSettings.ConnectionString);
+            _mongoClient = new MongoClient(TestCQRS3DatabaseSettings.LogConnectionString);
             _database = _mongoClient.GetDatabase(TestCQRS3DatabaseSettings.LogDBName);
         }
 
