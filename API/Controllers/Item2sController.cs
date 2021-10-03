@@ -9,8 +9,9 @@ using TestCQRS3.Application.Query.QueryModel;
 
 namespace TestCQRS3.API.Controllers
 {
-    [Route("api/item2s")]
+    [Route("api/v{v:apiVersion}/item2s")]
     [ApiController]
+    [ApiVersion("1.0")]
     [Authorize]
     public class Item2sController : ControllerBase
     {

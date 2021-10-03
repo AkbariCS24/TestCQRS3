@@ -2,6 +2,8 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,7 +11,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Text;
+using TestCQRS3.API.Helpers;
 using TestCQRS3.Application.Command.Commands.Items;
 using TestCQRS3.Application.Command.Common;
 using TestCQRS3.Application.Query;
@@ -33,7 +37,7 @@ namespace TestCQRS3.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //DataBase Settings Config
+            // DataBase Settings Config
             services.Configure<TestCQRS3DatabaseSettings>(
                 Configuration.GetSection(nameof(TestCQRS3DatabaseSettings)));
             services.AddSingleton<ITestCQRS3DatabaseSettings>(sp =>
@@ -45,19 +49,19 @@ namespace TestCQRS3.API
             // Add LogDbContext
             services.AddSingleton<LogDBContext>();
 
-            //Add DBContext
+            // Add DBContext
             services.AddScoped<ITestCQRS3DBContext, TestCQRS3DBContext>();
             services.AddDbContext<TestCQRS3DBContext>(options =>
              options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            //Add Service
+            // Add Service
             services.AddScoped<IServiceWrapper, ServiceWrapper>();
 
-            //Add MediatR
+            // Add MediatR
             services.AddMediatR(typeof(ReadDBContext).Assembly);
             services.AddMediatR(typeof(CreateItemCommand).Assembly);
 
-            //Add JWT
+            // Add JWT
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     .AddJwtBearer(options =>
                     {
@@ -73,17 +77,39 @@ namespace TestCQRS3.API
                         };
                     });
 
+            // Add Api Versioning
+            services.AddApiVersioning(x =>
+            {
+                x.DefaultApiVersion = new ApiVersion(1, 0);
+                x.AssumeDefaultVersionWhenUnspecified = true;
+                x.ReportApiVersions = true;
+            });
 
-            //services.AddSwaggerGen();
+            // Add Versioned Api Explorer
+            services.AddVersionedApiExplorer(options =>
+            {
+                // add the versioned api explorer, which also adds IApiVersionDescriptionProvider service  
+                // note: the specified format code will format the version as "'v'major[.minor][-status]"  
+                options.GroupNameFormat = "'v'VVV";
+
+                // note: this option is only necessary when versioning by url segment. the SubstitutionFormat  
+                // can also be used to control the format of the API version in route templates  
+                options.SubstituteApiVersionInUrl = true;
+            });
+
+            // Add Swagger Options
+            services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+
+            // Add Swagger
             services.AddSwaggerGen(swagger =>
             {
                 //This is to generate the Default UI of Swagger Documentation
-                swagger.SwaggerDoc("v1", new OpenApiInfo
-                {
-                    Version = "v1",
-                    Title = "TestCQRS3",
-                    Description = "Impliment CQRS With Clean Architecture"
-                });
+                //swagger.SwaggerDoc("v1", new OpenApiInfo
+                //{
+                //    Version = "v1",
+                //    Title = "TestCQRS3",
+                //    Description = "Impliment CQRS With Clean Architecture"
+                //});
                 // To Enable authorization using Swagger (JWT)
                 swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
                 {
@@ -108,17 +134,19 @@ namespace TestCQRS3.API
                  new string[] {}
                  }
                  });
+                swagger.OperationFilter<SwaggerDefaultValues>();
             });
 
+            // Add Controllers
             services.AddControllersWithViews();
 
-            //Add Logger
+            // Add Logger
             services.AddScoped<ILogger, Logger>();
 
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider provider)
         {
             if (env.IsDevelopment())
             {
@@ -127,9 +155,14 @@ namespace TestCQRS3.API
 
             app.UseSwagger();
 
-            app.UseSwaggerUI(c =>
+            app.UseSwaggerUI(
+            options =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                // build a swagger endpoint for each discovered API version  
+                foreach (var description in provider.ApiVersionDescriptions)
+                {
+                    options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
+                }
             });
 
             app.UseHttpsRedirection();

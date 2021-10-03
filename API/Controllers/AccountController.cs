@@ -10,10 +10,12 @@ using System.Text;
 using TestCQRS3.Application.Command.Commands.Account;
 using TestCQRS3.Domain.Contracts;
 using TestCQRS3.Domain.Enums;
+using TestCQRS3.API.Helpers;
 
 namespace TestCQRS3.API.Controllers
 {
-    [Route("api/account")]
+    [Route("api/v{v:apiVersion}/account")]
+    [ApiVersion("1.0")]
     [ApiController]
     public class AccountController : ControllerBase
     {
@@ -38,7 +40,7 @@ namespace TestCQRS3.API.Controllers
 
             if (user != null)
             {
-                var tokenString = GenerateJSONWebToken(user);
+                var tokenString = WebToken.GenerateJSONWebToken(_config, user.UserName, user.Password, user.Role);
                 response = Ok(new { token = tokenString });
                 _logger.Log(LogType.UserLogin, user.UserName, $"loggin date: {DateTime.Now}");
             }
@@ -62,27 +64,5 @@ namespace TestCQRS3.API.Controllers
 
             return response;
         }
-
-        private string GenerateJSONWebToken(UserCommandResult userInfo)
-        {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-            var claims = new[] {
-            new Claim(JwtRegisteredClaimNames.Sub, userInfo.UserName),
-            new Claim(JwtRegisteredClaimNames.Email, userInfo.Email),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.Role,userInfo.Role),
-            };
-
-            var token = new JwtSecurityToken(_config["Jwt:Issuer"],
-                _config["Jwt:Issuer"],
-                claims,
-                expires: DateTime.Now.AddMinutes(60),
-                signingCredentials: credentials);
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
     }
 }
