@@ -71,8 +71,8 @@ namespace TestCQRS3.API
                             ValidateAudience = true,
                             ValidateLifetime = true,
                             ValidateIssuerSigningKey = true,
-                            ValidIssuer = Configuration["Jwt:Issuer"],
-                            ValidAudience = Configuration["Jwt:Issuer"],
+                            ValidIssuer = Configuration["Jwt:ValidIssuer"],
+                            ValidAudience = Configuration["Jwt:ValidIssuer"],
                             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
                         };
                     });
