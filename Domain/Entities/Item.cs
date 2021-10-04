@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace TestCQRS3.Domain.Entities
 {
-    public class Item
+    public class Item : BaseEntity
     {
         protected Item() { }
 
@@ -22,12 +22,9 @@ namespace TestCQRS3.Domain.Entities
             Field3 = field3;
         }
 
-        public int Id { get; set; }
         public string Field1 { get; set; }
         public string Field2 { get; set; }
         public string Field3 { get; set; }
-        public DateTime InsertDate { get; set; } = DateTime.Now;
-        public DateTime ModifyDate { get; set; }
 
         public ICollection<Item2> Item2s { get; set; }
 

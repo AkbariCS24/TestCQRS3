@@ -2,7 +2,7 @@
 
 namespace TestCQRS3.Domain.Entities
 {
-    public class Item2
+    public class Item2 : BaseEntity
     {
         protected Item2() { }
 
@@ -23,14 +23,10 @@ namespace TestCQRS3.Domain.Entities
             Field3 = field3;
         }
 
-        public int Id { get; set; }
         public int ItemId { get; set; }
         public string Field1 { get; set; }
         public bool Field2 { get; set; }
         public string Field3 { get; set; }
-        public DateTime InsertDate { get; set; } = DateTime.Now;
-        public DateTime ModifyDate { get; set; }
-
 
         public Item Item { get; set; }
 
